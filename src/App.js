@@ -1,25 +1,32 @@
-import logo from './logo.svg';
 import './App.css';
+import { ConfigProvider, Layout, Typography } from 'antd';
+import Product from './pages/product';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    return (
+        <ConfigProvider
+            theme={{
+                token: {
+                    colorPrimary: '#333',
+                    borderRadius: 10,
+                }
+            }}
         >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+            <Layout className='main-layout'>
+                <Layout.Header className='main-header'>
+                    <Typography.Title style={{ margin: 0, color: '#fff' }}>
+                        Product Management App
+                    </Typography.Title>
+                </Layout.Header>
+                <Layout.Content className='main-content'>
+                    <Product />
+                </Layout.Content>
+                <Layout.Footer className='main-footer'>
+                    © 2024 Product Management App
+                </Layout.Footer>
+            </Layout>
+        </ConfigProvider >
+    );
 }
 
 export default App;
