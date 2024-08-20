@@ -2,47 +2,35 @@ import { Button, Flex, Popconfirm, Space, Table, Typography } from 'antd'
 import React, { useEffect, useState } from 'react'
 import AddProduct from '../components/AddProduct';
 import EditProduct from '../components/EditProduct';
-import { apiClient } from '../shared/apiClient';
 import { openNotificationWithIcon } from '../shared/notification';
+import { useDispatch, useSelector } from 'react-redux';
+import { addProduct, deleteProduct, fetchProducts, updateProduct } from '../reducers/productSlice';
 
 function Product() {
-    const [data, setData] = useState([])
+    const dispatch = useDispatch()
+    const products = useSelector(state => state.products)
     const [addProductVisible, setAddProductVisible] = useState(false)
     const [editProductVisible, setEditProductVisible] = useState(false)
     const [editProductData, setEditProductData] = useState({})
 
-    const fetchData = () => {
-        apiClient.get('/products').then((res) => {
-            setData(res.data)
-        }).catch((err) => openNotificationWithIcon('error', 'Something went wrong!'))
-    }
 
     useEffect(() => {
-        fetchData()
+        dispatch(fetchProducts())
     }, [])
 
     const handleAddProduct = (values) => {
-        apiClient.post('/products', values).then((res) => {
-            setAddProductVisible(false)
-            openNotificationWithIcon('success', `Product ${values.name} has been added.`)
-            fetchData()
-        }).catch((err) => openNotificationWithIcon('error', 'Something went wrong!'))
+        dispatch(addProduct(values))
+        setAddProductVisible(false)
     }
 
     const handleEditProduct = (id, values) => {
-        apiClient.patch(`/products/${id}`, values).then((res) => {
-            setEditProductVisible(false)
-            setEditProductData({})
-            openNotificationWithIcon('success', `Product ${id} has been updated`)
-            fetchData();
-        }).catch((err) => openNotificationWithIcon('error', 'Something went wrong!'))
+        dispatch(updateProduct({ id, product: values }))
+        setEditProductVisible(false)
+        setEditProductData({})
     }
 
-    const handleDelete = (id, name) => {
-        apiClient.delete(`/products/${id}`).then((res) => {
-            openNotificationWithIcon('success', `Product ${name} has been deleted.`)
-            fetchData();
-        }).catch((err) => openNotificationWithIcon('error', 'Something went wrong!'))
+    const handleDelete = (id) => {
+        dispatch(deleteProduct(id))
     }
     const columns = [
         {
@@ -93,8 +81,8 @@ function Product() {
                     </Flex>
                 )}
                 columns={columns}
-                dataSource={data}
-                pagination={{ pageSize: 10 }}
+                dataSource={products.products}
+                loading={products.status === 'loading'}
                 scroll={{ y: 500 }}
                 rowKey={'id'}
 
